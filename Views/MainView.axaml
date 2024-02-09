@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:FluentuiemojiPreview.ViewModels"
+			 xmlns:svg="clr-namespace:Avalonia.Svg.Skia;assembly=Avalonia.Svg.Skia"
+             mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="300"
+             x:Class="FluentuiemojiPreview.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainViewModel />
+  </Design.DataContext>
+
+	<UserControl.Styles>
+		<Style Selector="ListBox.pre">
+			<Setter Property="Margin" Value="10"/>
+			<Setter Property="ItemTemplate">
+				<DataTemplate>
+					<Grid Height="30">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="250"/>
+							<ColumnDefinition/>
+							<ColumnDefinition Width="100"/>
+						</Grid.ColumnDefinitions>
+						<Label x:Name="lbl_imgStr" Content="{Binding Title}"/>
+						<Image x:Name="imgSource" Grid.Column="1" Source="{Binding Description_PNG}"/>
+					</Grid>
+				</DataTemplate>
+			</Setter>
+			<Style Selector="^ /template/Label#lbl_imgStr">
+				<Setter Property="Margin" Value="0,0,30,0"/>
+				<Setter Property="Content" Value="{Binding Title}"/>
+			</Style>
+			<Style Selector="^ /template/Image#imgSource">
+				<Setter Property="HorizontalAlignment" Value="Center"/>
+				<Setter Property="Width" Value="30"/>
+				<Setter Property="Height" Value="30"/>
+			</Style>
+		</Style>
+	</UserControl.Styles>
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition/>
+			<ColumnDefinition Width="0.5*"/>
+		</Grid.ColumnDefinitions>
+
+		<ScrollViewer>
+			<ListBox x:Name="lsb" 
+					 Tag="{Binding CurrentEmojiName}" 
+					 ItemsSource="{Binding EmojiList}" 
+					 SelectedIndex="{Binding SelectIndex}">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="250"/>
+								<ColumnDefinition/>
+								<ColumnDefinition Width="100"/>
+							</Grid.ColumnDefinitions>
+							<Label Content="{Binding Title}" Margin="0,0,30,0"/>
+							<Image Grid.Column="1"
+								   HorizontalAlignment="Center"
+								   Width="30" Height="30" 
+								   Source="{Binding Description_PNG}"/>
+							<Button Grid.Column="2"
+									Content="复制名称" 
+									Margin="0,0,10,0"
+									Click="Button_Click"/>
+						</Grid>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+				<Interaction.Behaviors>
+					<EventTriggerBehavior EventName="SelectionChanged">
+						<InvokeCommandAction Command="{Binding SwitchEmojiCommand}"/>
+					</EventTriggerBehavior>
+				</Interaction.Behaviors>
+			</ListBox>
+		</ScrollViewer>
+
+		<Grid Grid.Column="1">
+			<StackPanel>
+				<Image Height="150" Width="150" Source="{Binding CurrentEmoji}"/>
+				<Label Content="{Binding CurrentEmojiName}" HorizontalAlignment="Center" FontSize="15"/>
+				<UniformGrid Columns="4" Margin="10">
+					<Button Content="返回首页" Command="{Binding GotoInitialPageCommand}"/>
+					<Button Content="下一页" Command="{Binding NextPageCommand}"/>
+					<Button Content="上一页" Command="{Binding PreviousPageCommand}"/>
+					<Button Content="查看页尾" Command="{Binding GotoLastPageCommand}"/>
+				</UniformGrid>
+				<UniformGrid Columns="2"
+							 Margin="10,0,10,0">
+					<Label Content="当前页："/>
+					<Label Content="{Binding CurrentPage}"/>
+				</UniformGrid>
+				<StackPanel Orientation="Horizontal">
+					<Label Content="搜索" VerticalAlignment="Center"/>
+					<TextBox Watermark="请输入文件名" Width="150" Text="{Binding SerachPattern}"/>
+					<Button Margin="5,0,0,0" 
+							Content="开始查询" 
+							Command="{Binding SerachEmojiNameCommand}"/>
+				</StackPanel>
+				<ListBox ItemsSource="{Binding SearchEmojiList}" Classes="pre"/>
+			</StackPanel>
+		</Grid>
+	</Grid>
+</UserControl>
